@@ -1,0 +1,177 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+%% color for the links 
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{longtable, graphicx}
+\usepackage{multicol}
+\usepackage{ebgaramond}		% for boldface small caps
+\usepackage{changepage}		% for indented paragraph blocks
+% We will generate all images so they have a width \maxwidth. This means
+% that they will get their normal width if they fit onto the page, but
+% are scaled down if they would overflow the margins.
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+\else\Gin@nat@width\fi}
+\makeatother
+\let\Oldincludegraphics\includegraphics
+% \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
+%% hyperlinks
+\usepackage[
+	colorlinks=true,
+	urlcolor=MidnightBlue,
+	plainpages=false,
+  	]{hyperref}% color for the links 
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{0}
+
+\title{SMGT 432: Soccer Analytics}
+\author{Scott Powers}
+\date{Fall 2023}
+
+
+
+\begin{document}
+
+\begin{multicols}{2}
+
+	\includegraphics[width = 0.45\textwidth]{../../images/rice_smgt.png}
+
+	\columnbreak
+
+	\raggedleft
+	{\bf Course:} SMGT $432$ -- Soccer Analytics\\
+	{\bf Term:} Fall $2023$\\
+	{\bf Class:} $1$ p.m. -- $1$:$50$ p.m. Mon/Wed/Fri
+
+\end{multicols}
+
+\hrule
+
+~\\
+\textbf{\textsc{Instructor Contact Information}}
+\begin{adjustwidth}{1cm}{0cm}
+	{\bf Instructor:} Scott Powers\\
+  {\bf Office:} Kraft $246$\\
+  {\bf Email:} scott.powers@rice.edu\\
+  {\bf Office Hours:} $2$ p.m. to $3$ p.m. Monday and Wednesday, and by appointment\\
+\end{adjustwidth}
+
+\textbf{\textsc{Required Texts and Materials}}
+\begin{adjustwidth}{1cm}{0cm}
+	{\bf Class Website:} https://canvas.rice.edu\\
+	{\bf Required Text:} All readings and videos will be made available on Canvas.\\
+	{\bf Required Material:} Bring pen/pencil and paper to class every day. Bring your laptop on Pydays (see below).
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Topics}}
+\begin{adjustwidth}{1cm}{0cm}
+	Team Evaluation ($\sim 2$ weeks), Event Data Visualization ($\sim 1$ week), Expected Goals ($\sim 2$ weeks),\\
+  Player Evaluation with Event Data ($\sim 3$ weeks), Tracking Data ($\sim 3$ weeks), Team Tactics ($\sim 1$ week)
+\end{adjustwidth}
+
+
+~\\
+\textbf{\textsc{Course Objectives and Learning Outcomes}}
+\begin{adjustwidth}{1cm}{0cm}
+  After successfully completing this course, you will be able to:
+  \begin{itemize}
+    \item Identify an interesting research problem in soccer, solve it with data, and present your solution.
+    \item Predict match-level and event-level outcomes in soccer, and test the accuracy of your predictions.
+    \item Use Python and Statsbomb event data to evaluate individual soccer player performance.
+    \item Use Python and player tracking data to calculate metrics relevant to winning soccer matches.
+  \end{itemize}
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Course Structure}}
+\begin{adjustwidth}{1cm}{0cm}
+  \textbf{Reading Discussions.} Most Mondays (and some Wednesdays), we will have a reading assignment due. It is important to complete the reading ahead of class because we will use that class period to discuss the reading. If you do not do the reading before the class period, you will struggle to participate in the discussion.
+
+  \textbf{Friday = Pyday.} Please bring your laptops to class every Friday because we will work through an interactive Python exercise to practice what we've been learning. Work at your own pace, and if you complete the exercise before the end of the period, you are welcome to shift your focus toward thinking about your project.
+
+  \textbf{Guest Speakers.} We plan to have $3$-$4$ guest speakers during the semester depending on availability.
+
+	\textbf{Fantasy League.} We will run a Fantasy Premier League during this semester. The purpose of this league is purely to motivate your curiosity for the subject material. You will not be graded on your fantasy league performance, and you are not required to maintain any minimum level of team management.
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Grade Policies}}
+\begin{adjustwidth}{1cm}{0cm}
+	Sport analytics is a demanding and highly competitive field. This class aims to provide the tough but honest feedback that you will need to succeed in it.
+  \begin{center}
+    \begin{tabular}{rclcrclcrcl}
+                      &               &     & & $93$--$100$ pts & $\rightarrow$ & A & & $90$--$92$ pts  & $\rightarrow$	& A--\\
+      $87$--$89$ pts  & $\rightarrow$	& B+  & & $83$--$86$ pts  & $\rightarrow$ & B & & $80$--$82$ pts  & $\rightarrow$	& B--\\
+      $77$--$79$ pts  & $\rightarrow$	& C+  & & $73$--$76$ pts  & $\rightarrow$ & C & & $70$--$72$ pts  & $\rightarrow$	& C--\\
+      $67$--$69$ pts  & $\rightarrow$	& D+  & & $63$--$66$ pts  & $\rightarrow$ & D & & $60$--$62$ pts  & $\rightarrow$ & D--\\
+                      &               &     & & $0$--$59$ pts   & $\rightarrow$ & F\\
+    \end{tabular}
+  \end{center}
+  ~\\
+	\textbf{Assignments.} ($40$ pts) There are four homework assigments. Each assignment will include a writeup and a code submission. Assignments must be prepared for submission individually (don't submit writeups that share chunks of text verbatim), but you are encouraged to work together and help each other find solutions to challenging aspects of the assignments.
+  \begin{itemize}
+    \item Assignment \#$1$ ($10$ pts): Match Prediction Contest   \hfill  expected hours: $9$
+    \item Assignment \#$2$ ($10$ pts): Build-Your-Own xG          \hfill  expected hours: $9$
+    \item Assignment \#$3$ ($10$ pts): Player Evaluation          \hfill  expected hours: $9$
+    \item Assignment \#$4$ ($10$ pts): Tracking Data              \hfill  expected hours: $9$
+  \end{itemize}
+
+  \textbf{Project.} ($40$ pts) This is a project-based course, and the project you build in stages over the course of the semester will determine a large chunk of your grade. Projects may be completed individually or in pairs (no more than two students).
+  \begin{itemize}
+    \item Project \#$0$ ($0$ pts): Registration                   \hfill expected hours: $1$
+    \item Project \#$1$ ($5$ pts): Proposal                       \hfill expected hours: $5$
+    \item Project \#$2$ ($10$ pts): Abstract                      \hfill expected hours: $9$
+    \item Project \#$3$ ($20$ pts): Paper                         \hfill expected hours: $20$
+    \item Project \#$4$ ($5$ pts): Presentation                   \hfill expected hours: $5$
+  \end{itemize}
+
+	\textbf{Reading.} ($10$ pts) There will be $10$ reading assignments ($1$ point each) dispersed throughout the semester, with an average expected completion time of $30$ minutes. Reading assignments are due strictly at $1$ p.m. on their due date and may not be submitted late.
+
+  \textbf{Attend a Rice Soccer Match.} ($5$ pts) Rice varsity soccer has eight home matches this semester, the last of which is Oct $26$. Attend one of these matches and submit three observations relevant to the course.
+
+  \textbf{Participation Scavenger Hunt.} ($5$ pts) You get $1$ point for doing each of the following at least once during the semester: (a) asking a question of a guest speaker; (b) asking a question during a lecture; (c) asking a question during a student presentation; (d) leading a small-group discussion; (e) giving a post-assignment ``lightning presentation'' (details to be explained).
+
+  \textbf{Late Work.} All work is due (online submission via Canvas) at $1$ p.m. on its due date. You may submit the work late, subject to a $1$-point deduction for each day ($24$-hour period) it is late.
+
+  \textbf{Absence Policy.} Please notify me in advance if you are going to miss a class period.
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Rice Honor Code}}
+\begin{adjustwidth}{1cm}{0cm}
+  In this course, all students will be held to the standards of the Rice Honor Code, a code that you pledged to honor when you matriculated at this institution. If you are unfamiliar with the details of this code and how it is administered, you should consult the Honor System Handbook at \url{http://honor.rice.edu/honor-system-handbook/}. This handbook outlines the University's expectations for the integrity of your academic work, the procedures for resolving alleged violations of those expectations, and the rights and responsibilities of students and faculty members throughout the process.\\
+  ~\\
+  \textbf{AI Policy.} You are allowed (and even encouraged) to use AI as a tool for developing Python code (attribution in this case is not necessary). Please do not use AI to generate any part of your writeups.
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Disability Resource Center}}
+\begin{adjustwidth}{1cm}{0cm}
+  If you have a documented disability or other condition that may affect academic performance you should: $1$) make sure this documentation is on file with the Disability Resource Center (Allen Center, Room $111$ / \href{mailto:adarice@rice.edu}{adarice@rice.edu} / x$5841$) to determine the accommodations you need; and $2$) talk with me to discuss your accommodation needs.
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Mental Health Policy}}
+\begin{adjustwidth}{1cm}{0cm}
+	The wellbeing and mental health of students is important; if you are having trouble completing your coursework, please reach out to the Wellbeing and Counseling Center. Rice University provides cost-free mental health services through the Wellbeing and Counseling Center to help you manage personal challenges that threaten your personal or academic well-being. If you believe you are experiencing unusual amounts of stress, sadness, or anxiety, the Student Wellbeing Office or the Rice Counseling Center may be able to assist you. The Wellbeing and Counseling Center is located in the Gibbs Wellness Center and can be reached at 713-348-3311 (available 24/7).
+\end{adjustwidth}
+
+~\\
+\textbf{\textsc{Title IX Responsible Employee Notification}}
+\begin{adjustwidth}{1cm}{0cm}
+  At Rice University, unlawful discrimination in any form, including sexual misconduct, is prohibited under Rice Policy on Harassment and Sexual Harassment (Policy 830) and the Student Code of Conduct.
+
+  Please be aware that all employees of Rice University are ``mandatory reporters'', which means that if you tell me about a situation involving sexual harassment, sexual assault, dating violence, domestic violence, or stalking, I must share that information with the Title IX Coordinator.
+
+  Although I have to make that notification, you will control how your case will be handled, including whether or not you wish to pursue a formal complaint. Our goal is to make sure you are aware of the range of options available to you and have access to the resources you need.
+
+  To report sexual harassment, please contact the Title IX Coordinator at titleix@rice.edu. To explore supportive measures and other resources that are available to you, please visit the Office if Interpersonal Misconduct Prevention and Support at safe.rice.edu.
+\end{adjustwidth}
+
+~\\
+\textbf{This syllabus is only a guide for the course and is subject to change with advance notice.}
+
+\end{document}

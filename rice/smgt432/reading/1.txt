@@ -1,0 +1,18 @@
+https://dashee87.github.io/football/python/predicting-football-results-with-statistical-modelling/
+
+According to the author's model, which team had the strongest defense in the 2016-17 English Premier League?
+
+According to the author's model, where did Arsenal's offense rank among all teams in the 2016-17 English Premier League?
+
+Suppose we add a match to the dataset in which a new club, AFC Richmond, at home, defeat West Ham 3-2. How would the estimated model coefficients change?
+- What is the objective of logistic regression? (maximize the log-likelihood)
+  - We've already maximized the likelihood on the rest of the data
+- What's the best possible likelihood we could get for this new game?
+  log(P(Y = 3)) = log(lambda^3 * exp(lambda) / 3!)
+                = 3 * log(lambda) - lambda - log(3!)
+  d / dlambda = 3 / lambda - 1 = 0
+    => lambda = 3   <--- 3 is the number of goals scored. Coincidence? (no)
+- How can we achieve that value of lambda for this new game?
+  log(3) = 0.37 + beta + 0.35
+  1.10 = beta + 0.72
+  beta = 0.38
