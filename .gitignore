@@ -1,4 +1,6 @@
 
+*.DS_STORE
+
 # LaTeX helper files
 *.aux
 *.fdb_latexmk
