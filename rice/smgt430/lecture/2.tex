@@ -1,0 +1,41 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+\begin{framed}
+  {\bf Caution:} These lecture notes are under construction. You may find parts that are incomplete.
+\end{framed}
+
+\setcounter{section}{1}
+\section{\sc Pythagorean Formula}
+
+\subsection{\sc Introduction}
+
+The Pythagorean formula, first proposed by Bill James in ????, estimates a baseball team's winning percentage (W\%) as a function of the number of runs scored (RS) and the number of runs allowed (RA):
+$$
+  \hat{\mbox{W\%}}_{\mbox{Pythag}} = \frac{\mbox{RS}^2}{\mbox{RS}^2 + \mbox{RA}^2}.
+$$
+
+The name ``Pythagorean formula'' is a reference to the Pythagorean theorem from geometry, which asserts that $a^2 + b^2 = c^2$, where $c$ is the length of the hypoteneuse of a right triangle, and the lengths of the other two sides are $a$ and $b$. The Pythagorean formula of sport analytics is not a theorem, but it does bear some resemblance to the Pythagorean theorem of geometry.
+
+The key observation justifying the use of the Pythagorean formula is that a team's run differential is a more predictive indicator of team strength than is the team's win-loss record.
+
+\subsection{\sc Generalization}
+
+It is not clear how James came up with his Pythagorean formula. A prolific baseball mind, he was known for combining his intuition for the game with a trial-and-error method for finding the formulas that would suit his purpose. The Pythagorean formula turned out to work quite well for predicting baseball team winning percentage. This leads to the natural question: {\it Is there a better formula for predicting team winning percentage?}
+
+So that our notation applies more generally across sports, let us replace runs scored and runs allowed with points scored (PS) and points allowed (PA). There is an overwhelming set of possible functions that could relate points scored and allowed to winning percentage, but let us limit ourselves to those that take the same functional form as the Pythagorean formula:
+$$
+  \hat{\mbox{W\%}}_{\mbox{Pythag}}^\alpha = \frac{\mbox{PS}^\alpha}{\mbox{PS}^\alpha + \mbox{PA}^\alpha},
+$$
+for some $\alpha \ge 0$. If $\alpha = 0$, that corresponds to no relationship between score differential and winning percentage (because the Pythagorean winning percentage is identical to 50\%). As $\alpha$ increases, so too does the strength of the relationship between score differential and winning percentage. As $\alpha$ tends to infinity, the Pythagorean winning percentage converges to 100\% for any positive score differential (and 0\% for any negative score differential).
+
+To determine the best value for $\alpha$, 
+
+\subsection{\sc Consequences}
+
+One key consequence of the Pythagorean formula is that if our goal is team evaluation or prediction of future game outcomes, we are generally better off basing our analysis on score differential rather than binary win/loss outcomes. Another important consequence is that if our goal is to measure player contributions to team success, we can often use scores as our unit of measurement. The objective of front office decision-makers is generally to maximize team winning (subject to budgetary constraints). Player evaluations based on scores are often less noisy than player evaluations based on wins, and the Pythagorean formula serves as a conversion between scoring and winning. For example, most implementations of baseball's Wins Above Replacement (WAR) are based first on a calculation of Runs Above Replacement.
+
+\end{document}

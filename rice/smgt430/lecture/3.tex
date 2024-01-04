@@ -1,0 +1,125 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+\begin{framed}
+  {\sc Caution:} These lecture notes are under construction. You may find parts that are incomplete.
+\end{framed}
+
+\setcounter{section}{2}
+\section{\sc The Bradley-Terry Model}
+
+  We learned in Chapter ?? that a team's past score differential is generally a stronger predictor of its future winning percentage than is its past winning percentage. Missing from a team's score differential is any information about the quality of its opposition (i.e. strength of schedule). That is the focus of this chapter.
+
+  We start by introducing some mathematical notation to describe score differential. Suppose we have a dataset of $n$ games between $p$ teams. For each game $i \in \{1, 2, ..., n\}$, we observe the home team $h_i \in \{1, ..., p\}$; the away team $a_i \in \{1, ..., p\}$; and the score differential $y_i$ (home score minus away score). We use $x_{ij} = \{\mathbb{I}(h_i = j) - \mathbb{I}(a_i = j)\}$ to indicate whether team $j$ is home/away/inactive (+1/--1/0) in game $i$. From these definitions, we calculate the average score differential per game for team $j$ as:
+  \begin{equation*}
+    s_j = \frac{
+      \sum_{i=1}^n x_{ij} \cdot y_i
+    }{
+      \sum_{i=1}^n x_{ij}^2
+    }.
+  \end{equation*}
+
+  We may interpret $s_j$ as an estimate of the strength of team $j$. We could use these estimated strengths to calculate a strength-of-schedule-adjusted score differential for each game. If $o_{ij}$ is the opponent of team $j$ in game $i$, then we would achieve this with $x_{ij} \cdot y_i + d_{o_{ij}}$. This leads to a strength-of-schedule-adjusted average score differential for team $j$:
+  \begin{equation}
+    \label{eqn-adjusted-point-differential}
+    s^*_j = \frac{
+      \sum_{i=1}^n x_{ij} \cdot y_i + d_{o_{ij}}
+    }{
+      \sum_{i=1}^n x_{ij}^2
+    }.
+  \end{equation}
+  Perhaps $s^*_j$ is a batter estimate of team strength than $s_j$ because it accounts for strength of schedule. So maybe we can do better by replacing $s_{o_{ij}}$ with $s^*_{o_{ij}}$ in the equation above. This would yield a better strength estimate $s^{**}_j$ to replace $s^*_{o_{ij}}$, and so on. Instead of repeating this operation indefinitely, let us jump straight to the end with a cogent statistical model.
+
+  \subsection{\sc Modeling Score Differential}
+
+  In its simplest form, the Bradley-Terry model describes the distribution of the random variable $Y_i$, representing the score differential of game $i$:
+  \begin{align}
+    \label{eqn-linear-regression}
+    \begin{split}
+      \eta_i &= \beta_0 + \beta_{h_i} - \beta_{a_i}\\
+      Y_i &\sim \mbox{Normal}(\eta_i, \sigma^2).
+    \end{split}
+  \end{align}
+  This model model has $p + 1$ regression coefficients to estimate: one $\beta$ for each team (interpretable as the team's strength), as well as $\beta_0$ (interpretable as home-field advantage).\footnote{The variance parameter $\sigma^2$ is also a fixed, unknown parameter. It is considered a {\it nuisance parameter} because its estimation has no bearing on the regression coefficients, which are of primary interest.} Unfortunately, this model is not identifiable, meaning that the parameters cannot be uniquely estimated from the data. To see this, note that if we add any constant $c$ to all team strengths, the predictions do not change because
+  \begin{equation*}
+    \beta_0 + \beta_{h_i} - \beta_{a_i} = \beta_0 + (\beta_{h_i} + c) - (\beta_{a_i} + c)
+  \end{equation*}
+  for any $c \in \mathbb{R}$. To make the model identifiable, we must introduce an additional constraint. The simplest, most common constraint is to set $\beta_1 = 0$, meaning that the first team is the reference team against which all other teams are measured. Having established this constraint, we proceed with $p$ regression coefficients to estimate.
+  
+  You may recognize this as a linear regression model. The simplest method for estimating the unknown parameters is ordinary least squares (OLS). Using $\boldsymbol{\beta}$ to denote the $p \times 1$ vector of regression coefficients, we choose $\boldsymbol{\beta}$ to minimize the sum of squared residuals (equivalent to maximizing likelihood of the data):
+  \begin{equation}
+    \label{eqn-least-squares}
+    \boldsymbol{\hat\beta} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^n (y_i - (\beta_0 + \beta_{h_i} - \beta_{a_i}))^2 \hspace{1cm} \mbox{ s.t. } \beta_1 = 0.
+  \end{equation}
+
+  This optimization problem has a closed-form solution, which can be derived by finding where the gradient is zero\footnote{We omit the details of this calculation. You can learn this in STAT 315 or DSCI 301.} (because the objective function is convex and differentiable). To express the solution, it is helpful to introduce matrix notation for the model. We use $\bf y$ to denote the $n \times 1$ vector of observed score differentials $(y_1, y_2, ..., y_n)^T$, and we use $\bf X$ to denote the $n \times p$ matrix encoding the intercept (+1), home team (+1) and away team (--1) of each game. Namely:
+  \begin{equation*}
+    ({\bf X})_{ij} = \begin{cases}
+      +1 & \mbox{if $j = 1$ (intercept column)}\\
+      +1 & \mbox{if $h_i$ is team $j$}\\
+      -1 & \mbox{if $a_i$ is team $j$}\\
+      0 & \mbox{otherwise}
+    \end{cases}.
+  \end{equation*}
+  Note that every row of $\bf X$ has at most three nonzero entries: one +1 for the intercept, one +1 for the home team and one --1 for the away team. Recall that team 1 is not represented in $\bf X$ (because of the constraint that $\beta_1 = 0$), so rows corresponding to games in which team 1 is active will have only two nonzero entries. Because the vast majority of $\bf X$ is zero, we call it a {\it sparse} matrix.\footnote{The most notable aspect of sparse matrices for our needs is that we can leverage them for computational speedups.} Using this notation, the OLS solution is:
+  \begin{equation*}
+    \boldsymbol{\hat\beta} = ({\bf X}^T {\bf X})^{-1} {\bf X}^T {\bf y}.
+  \end{equation*}
+
+  We interpret $\hat\beta_j$, the element of $\boldsymbol{\hat\beta}$ corresponding to team $j$, to be the estimated strength of team $j$. A satisfying property of these estimated strengths is that they are a steady-state solution to equation (\ref{eqn-adjusted-point-differential}), meaning:
+  \begin{equation*}
+    \hat\beta_j = \frac{
+      \sum_{i=1}^n x_{ij} \cdot y_i + \hat\beta_{o_{ij}}
+    }{
+      \sum_{i=1}^n x_{ij}^2
+    }.
+  \end{equation*}
+  In other words, $\hat\beta_j$ is equivalent to the score differential for team $j$ after adjusting for strength of schedule, where team strengths are defined by $\boldsymbol{\hat\beta}$.
+
+  \subsection{\sc Modeling Win-Loss Outcome}
+
+  Although we prefer to evaluate teams based on score differential for most applications, the Bradley-Terry model can be generalized to model the win-loss outcome as well. The random variable $Z_i = \mathbb{I}(Y_i > 0)$ represents an indicator of whether the home team wins game $i$.
+  \begin{align}
+    \label{eqn-logistic-regression}
+    \begin{split}
+      \eta_i &= \beta_0 + \beta_{h_i} - \beta_{a_i}\\
+      Z_i &\sim \mbox{Bernoulli}\left(\frac{e^{\eta_i}}{1 + e^{\eta_i}}\right).
+    \end{split}
+  \end{align}
+  We require the same constraint as in equation (\ref{eqn-linear-regression}), that $\beta_1 = 0$. You may recognize this as a logistic regression model. As with linear regression, we choose $\boldsymbol{\beta}$ to maximize the log-likelihood of the observed data $z_1, z_2, ..., z_n$, equivalent to minimizing the negative log-likelihood:
+  \begin{equation*}
+    \boldsymbol{\hat\beta} = \arg\min_{\boldsymbol{\beta}} -\sum_{i=1}^n \left(z_i \log\left(\frac{e^{\eta_i}}{1 + e^{\eta_i}}\right) + (1 - z_i) \log\left(\frac{1}{1 + e^{\eta_i}}\right)\right) \hspace{1cm} \mbox{ s.t. } \beta_1 = 0.
+  \end{equation*}
+  Unlike equation (\ref{eqn-least-squares}), this optimization problem does not have a closed-form solution, and it is solved using an iterative algorithm.\footnote{We omit the details of this calculation. You can learn this in STAT 410.}
+
+  \begin{framed}
+    {\sc Discussion:} When might you prefer to model win-loss outcome instead of score differential?
+  \end{framed}
+
+  \subsection{\sc Predicting Future Outcomes}
+
+  For both the linear regression model in equation (\ref{eqn-linear-regression}) and the logistic regression model in equation (\ref{eqn-logistic-regression}), we calculate the $n \times 1$ vector $\boldsymbol{\hat\eta}$ of fitted values from the regression the same way:
+  \begin{equation*}
+    \boldsymbol{\hat\eta} = {\bf X} \boldsymbol{\hat\beta}.
+  \end{equation*}
+  For the linear regression, $\hat\eta_i$ is directly interpretable as the predicted score differential for game $i$, based on the estimated strengths of the home and away teams. For the logistic regression, $\hat\eta_i$ is the log-odds of the home team winning game $i$. We can convert this to a probability by applying the logistic function:
+  \begin{equation*}
+    \hat z_i = \frac{e^{\hat\eta_i}}{1 + e^{\hat\eta_i}}.
+  \end{equation*}
+
+  One interpretable insight we can draw from the estimated regression coefficients is an estimate for the home-field advantage. In the linear regression, $\hat\beta_0$ is the estimated effect on the point spread in favor of the home team. In the logistic regression, $\hat\beta_0$ is the estimated effect on the log-odds in favor of the home team.
+
+  Predicting the future outcomes is an important application for sports teams (because of the strategic implications) and for sports bettors. The design matrix $\bf X$ does not encode future games, but the formula for extracting predictions from the model is the same as for past games. For a future game between home team $h$ and away team $a$, the predicted score differential using the linear regression is $\hat\beta_h - \hat\beta_a$; and the predicted probability of the home team winning using the logistic regression is $e^{\hat\beta_h - \hat\beta_a} / (1 + e^{\hat\beta_h - \hat\beta_a})$. To make a large number of predictions in a computationally efficient way, one could encode the future matchups in a new design matrix $\bf \tilde X$ and extract the predictions using $\bf \tilde X \boldsymbol{\hat\beta}$.
+
+  \subsection{\sc Quiz Questions}
+
+  \begin{enumerate}
+    \item Why do we need to force $\beta_1 = 0$ in the Bradley-Terry model?
+    \item Suppose we estimate the Bradley-Terry model and find $\hat\beta_2 > 0$. What does this tell us about team 2?
+    \item Suppose we estimate the win-loss outcome model and find $\hat\beta_0 = 0.5$; $\hat\beta_2 = 1$; and $\hat\beta_p = 0.75$. What is the estimated probability that team $p$ beats team 2 at home?
+  \end{enumerate}
+
+\end{document}

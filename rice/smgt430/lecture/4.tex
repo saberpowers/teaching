@@ -1,0 +1,132 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+  \begin{framed}
+    {\sc Caution:} These lecture notes are under construction. You may find parts that are incomplete.
+  \end{framed}
+
+  \setcounter{section}{3}
+  \section{\sc Plus-Minus Models}
+
+  In the previous chapter, we learned about using point differentials to estimate team strengths. For team sports, we are often interested in estimating the strengths of individual players. This is particularly important for teams who have to make player personnel decisions in the form of trades, free agent signings and draft picks. In this chapter we will learn about one approach to player evaluation based on point differential {\it when the player is on the field}. The stat {\it Plus-Minus}, popularized in hockey and basketball, is just that---the score differential when the player is active in the game.
+  
+  To formalize this mathematically, we will introduce some notation. We define a {\it stint} to be a period of time during which no substitutions occur, meaning that the active players do not change during a stint. Assume we have a dataset of stints numbered $i = 1, 2, ..., n$ (which may span multiple games) and players numbered $j = 1, 2, ..., p$. For each stint $i$, we observe the following:
+  \begin{itemize}
+    \item $w_i$: the stint length, which may be measured by time (e.g. hockey) or possessions (e.g. basketball);
+    \item $y_i$: the {\it normalized} score differential (per unit of stint length) in favor of the home team; and
+    \item $x_{ij}$: the +1/--1/0 indicator that player $j$ is active for home/away/neither team in stint $i$.
+  \end{itemize}
+  The purpose of introducing the normalized score differential is to make apples-to-apples comparisons across stints of differenti lengths. For player $j$, their cumulative Plus-Minus is $\sum_i w_ix_{ij}y_i$, and their average Plus-Minus is:
+  \begin{equation}
+    \label{eqn-plus-minus}
+    s_j = \frac{
+      \sum_{i = 1}^n w_i \cdot x_{ij} \cdot y_i
+    }{
+      \sum_{i = 1}^n w_i \cdot x_{ij}^2
+    }.
+  \end{equation}
+
+  \begin{framed}
+    {\sc Discussion:} What are strengths and weaknesses of using Plus-Minus for player evaluation?
+  \end{framed}
+
+  \subsection{\sc Adjusted Plus-Minus}
+
+  One drawback of Plus-Minus is that if one player typically plays alongside a particularly strong teammate, this will inflate their Plus-Minus. In other words, Plus-Minus does not control for quality of competition {\it or} quality of teammates. Our method for addressing this is directly analogous to the strength-of-schedule adjustment we learned using the Bradley-Terry model in the previous chapter. We use the random variable $Y_i$ to represent the score differential of stint $i$, and we model the distribution of $Y_i$ as follows:
+  \begin{align}
+    \label{eqn-adjusted-plus-minus}
+    \begin{split}
+      \eta_i &= \beta_0 + \sum_{j \in H_i}\beta_{j} - \sum_{j' \in A_i}\beta_{j'}\\
+      Y_i &\sim \mbox{Normal}(\eta_i, \sigma^2 / w_i).
+    \end{split}
+  \end{align}
+  We have $p + 1$ regression coefficients to estimate: one $\beta$ for each player (interpretable as the player's strength), as well as $\beta_0$ (interpretable as home-field advantage). As in the previous chapter, this model is not identifiable, so we must introduce an additional constraint. The simplest, most common constraint is to set $\beta_1 = 0$, meaning that the first player is the reference player against which all other players are measured. Having established this constraint, we proceed with $p$ regression coefficients to estimate.
+
+  Note one key difference between equation (\ref{eqn-adjusted-plus-minus}) and the Bradley-Terry model from the previous chapter. In the Bradley-Terry model, the variance of $Y_i$ was assumed to be $\sigma^2$ for each $i$. In the Adjusted Plus-Minus model, the variance of $Y_i$ is $\sigma^2 / w_i$, which is different for each $i$. This reflects the intuition that there is more random noise involved in the normalized score differential for shorter stints. Because of this, when estimating the model, we want to put more weight on minimizing the error for longer stints. In contrast with OLS, our criterion for estimating the regression coefficient vector $\boldsymbol{\beta}$ is {\it weighted} least squares (WLS):
+  \begin{equation}
+    \label{eqn-weighted-squares}
+    \boldsymbol{\hat\beta} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^n w_i (y_i - (\beta_0 + \beta_{h_i} - \beta_{a_i}))^2 \hspace{1cm} \mbox{ s.t. } \beta_1 = 0.
+  \end{equation}
+  Note that this choice of $\boldsymbol{\hat\beta}$ is the {\it maximum likelihood estimator} of the model specified by equation (\ref{eqn-adjusted-plus-minus}).
+
+  We now introduce matrix notation to calculate the WLS estimator of the regression coefficients. We use ${\bf y} = (y_1, y_2, ..., y_n)^T$ to denote the $n \times 1$ vector of score differentials; we use $\bf X$ to denote the $n \times p$ sparse matrix of regression covariates; and we use $\bf W$ to denote the $n \times n$ diagonal matrix of observation weights:
+  \begin{equation*}
+    ({\bf X})_{ij} = \begin{cases}
+      +1 & \mbox{if $j = 1$ (intercept column)}\\
+      x_{ij} & \mbox{otherwise}
+    \end{cases},
+    \hspace{1cm}
+    ({\bf W})_{ii'} = \begin{cases}
+      w_i & \mbox{if $i = i'$}\\
+      0 & \mbox{otherwise}
+    \end{cases}.
+  \end{equation*}
+  Lastly, we use $\boldsymbol{\beta} = (\beta_0, \beta_2, \beta_3, ..., \beta_p)^T$ to denote the $p \times 1$ vector of regression coefficients. Then the WLS estimate of $\boldsymbol{\beta}$ is:
+  \begin{equation*}
+    \boldsymbol{\hat\beta} = ({\bf X}^T {\bf W} {\bf X})^{-1} {\bf X}^T {\bf W} {\bf y}.
+  \end{equation*}
+
+  We interpet $\hat\beta_j$ as the estimated strength of player $j$. As with the Bradley-Terry model, the Adjusted Plus-Minus model comes with the following satisfying property:
+  \begin{equation*}
+    \hat\beta_j = \frac{
+      \sum_{i = 1}^n w_i \left(x_{ij} \cdot y_i - \sum_{j' \neq j} \hat\beta_{j'}x_{ij'} \right)
+    }{
+      \sum_{i = 1}^n w_i \cdot x_{ij}^2
+    }.
+  \end{equation*}
+  Compare this expression with the definition of average Plus-Minus in equation (\ref{eqn-plus-minus}). Observe that the estimated strength of player $j$ is equivalent to their average Plus-Minus, after adjusting for the estimated strengths of all other players involved in player $j$'s stints. Hence the name: {\it Adjusted} Plus-Minus.
+
+  \begin{framed}
+    {\sc Discussion:} What are strengths and weaknesses of using Adjusted Plus-Minus for player evaluation?
+  \end{framed}
+
+  \subsection{\sc The Rasch Model}
+
+  So far we have seen two models (Bradley-Terry and Adjusted Plus-Minus) that are variations on the same concept. Whereas the Bradley-Terry model estimates team strengths, the Adjusted Plus-Minus model estimates player strengths. One may think of the Bradley-Terry model as a special case of a the Adjusted Plus-Minus model, where every matchup involves one home player and one away player (and every stint is the same length). In this section we introduce one more model which is yet another variation on this same core concept.
+
+  One commonality between Bradley-Terry and Adjusted Plus-Minus is that each team (or player) can appear on either side of each matchup: home or away. The strength of the team (or player) is the same regardless of the side on which they appear (although there is an effect for home-field advantage). For many adversarial interactions in sports, this restriction is not appropriate. Consider, for example, the matchup between a batter and a pitcher in baseball. While it is true that batters may pitch and that pitchers may bat on occasion, it is not reasonable to assume that a player's batting strength is equal to their pitching strength. Enter the Rasch model.
+
+  The Rasch model comes from the field of psychometrics. Originally it was used to model the performance of students on test questions. Each student is assumed to have an ability, and each question is assumed to have a difficulty. The probability of a successful answer is a function of the sum of the student's ability and the question's difficulty. This framework applies well to many sports applications. For example, we may assume that each batter has an ability and each pitcher has a difficulty, or vice versa.
+
+  For simplicity, we will describe the Rasch model in the context of modeling game scores. Unlike the Bradley-Terry model, however, we will estimate separate offensive and defensive strengths for each team. Assume we observe a set of team-scores $y_i$ (two team-scores per game) numbered $i = 1, 2, ..., n$ involving teams numbered $j = 1, 2, ..., p$. For each team-score $i$, $o_i$ is the team that did the scoring, and $d_i$ is the team that allowed the scoring. Using $Y_i$ to represent the random variable for team-score $i$, we model the distribution of $Y_i$ as follows:
+  \begin{equation*}
+    \begin{split}
+      \eta_{i} &= \beta_0 + \beta^O_{o_i} + \beta^D_{d_i}\\
+      Y_i &\sim \mbox{Normal}(\eta_i, \sigma^2).
+    \end{split}
+  \end{equation*}
+  Here we have introduced superscripts on $\beta^O$ to represent offensive strength and $\beta^D$ to represent defensive strength (more negative = stronger defense). We have $2p + 1$ regression coefficients to estimate: one $\beta^O$ for each team; one $\beta^D$ for each team; and the intercept $\beta_0$. Once again, this model is not identifiable until we introduce the additional constraint $\beta^O_1 = \beta^D_1 = 0$.
+  
+  To fit the Rasch model, we must estimate the $(2p - 1) \times 1$ vector $\boldsymbol{\beta} = (\beta_0, \beta^O_2, \beta^O_3, ..., \beta^O_p, \beta^D_2, \beta^D_3, ..., \beta^D_p)^T$. We are back in the land of OLS, so we can use the familiar formula once we first establish the necessary matrix notation. As before, the $n \times 1$ vector ${\bf y} = (y_1, y_2, ..., y_n)^T$ contains the observed team-scores. We construct our $n \times (2p - 1)$ matrix $\bf X$ by concatenating ${\bf 1} = (1, 1, ..., 1)^T \in \mathbb{R}^n$, ${\bf X}^O \in \mathbb{R}^{n \times (p - 1)}$, and ${\bf X}^D \in \mathbb{R}^{n \times (p - 1)}$:
+  \begin{equation*}
+    ({\bf X}^O)_{ij} = \begin{cases}
+      1 & \mbox{if $o_i = j - 1$}\\
+      0 & \mbox{otherwise}
+    \end{cases},
+    \hspace{1cm}
+    ({\bf X}^D)_{ij} = \begin{cases}
+      1 & \mbox{if $d_i = j - 1$}\\
+      0 & \mbox{otherwise}
+    \end{cases},
+    \hspace{1cm}
+    {\bf X} = ({\bf 1}, {\bf X}^O, {\bf X}^D).
+  \end{equation*}
+  Note that in this case, ${\bf X}$ is a sparse matrix with at most three nonzero entries (all equal to one) per row. With this established, the OLS estimate of $\boldsymbol{\beta}$ is $\boldsymbol{\hat\beta} = ({\bf X}^T{\bf X})^{-1}{\bf X}^T{\bf y}$.
+
+  The Rasch model is a generalization of the Bradley-Terry model in that the actors involved (teams or players) can have separate roles and separate strengths in each of these roles. We could generalize this further by allowing for non-normally distributed outcomes (as we saw with the Bradley-Terry model for win-loss outcomes) and/or by allowing for unequally weighted observations (as we saw with the Adjusted Plus-Minus model). Yet another way to generalize the Rasch model further is to allow for more than two roles. For example, one may hypothesize that the catcher and umpire could have some effect on the outcome of a baseball pitch (especially the ball/strike call if the batter does not swing). In this case, the linear term in the model would take the form $\eta_i = \beta_0 + \beta^B_{b_i} + \beta^P_{p_i} + \beta^C_{c_i} + \beta^U_{u_i}$, including effects from batter, pitcher, catcher and umpire. This is a flexible model that can describe the probability distribution of many different outcomes of interest in sports.
+
+  \begin{framed}
+    {\sc Discussion:} How is the Rasch model similar to the Bradley-Terry model? How is it different?
+  \end{framed}
+
+  \subsection{\sc Quiz Questions}
+
+  \begin{enumerate}
+    \item Why do we use Weighted Least Squares (WLS) instead of Ordinary Least Squares (OLS) to estimate the Adjusted Plus-Minus model?
+    \item Which is it: Is the Adjusted Plus-Minus model a special case of the Bradley-Terry model? Or is the Bradley-Terry model a special case of the Adjusted Plus-Minus model?
+  \end{enumerate}
+
+\end{document}

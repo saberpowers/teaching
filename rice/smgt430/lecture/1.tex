@@ -1,0 +1,113 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+\begin{framed}
+  {\bf Caution:} These lecture notes are under construction. You may find parts that are incomplete.
+\end{framed}
+
+\section{\sc Regression to the Mean}
+
+  If you have ever sorted a player leaderboard by a rate stat (e.g. on-base percentage in baseball, field goal percentage in basketball, yards per rush in football), you know the importance of filtering the rows on a minimum sample size threshold. If you do not perform this filtering, the top of your leaderboard is sure to be full with players who have performed incredibly in tiny samples. These performances do not reflect the true talent of the player because performance is the combination of talent and luck. The smaller the sample size, the greater the role played by luck in determining the performance. In other words, the smaller the sample, the greater the noise. Informally, we may write:
+  \begin{equation}
+    \label{eqn-talent-plus-luck}
+    \mbox{Performance = Talent + Luck}.
+  \end{equation}
+  If a player is near the top of the leaderboard (high performance), this is evidence in favor of both high talent and high luck. The smaller the sample size, the more plausible it is to attribute the performance to exceptionally high luck, and the less evidence we have in favor of high talent.
+
+  The standard solution to this problem is to filter the leaderboard on some sample size threshold. This is unsatisfactory because it fully discounts performance below the sample size threshold and applys no discount to performance above the threshold. We would prefer a method that smoothly decreases the discount as the sample size increases. Enter {\it regression to the mean}, which involves padding the observed performance with some amount of weight on the league average (aka {\it population mean}). Using $n$ to denote the sample size and $c$ to denote the weight on the population mean, the formula for regression to mean is:
+  \begin{equation}
+    \label{eqn-regression-to-mean}
+    \frac{n \cdot \mbox{(Observed Performance)} + c \cdot \mbox{(Population Mean)}}{n + c}.
+  \end{equation}
+  But how do we choose $c$?
+
+  \subsection{\sc A Statistical Model for Performance}
+
+    A rate stat is the average of repeated performance by an athlete. Let $Y_1$, $Y_2$, ..., $Y_n$ be random variables representing the performance of the athlete in $n$ repeated trials. We assume\footnote{This amounts to assuming that the expected performance on each trial is the same (regardless of competition faced and other context) and that the outcome of one trial does not affect the outcome of another trial. This assumption is not literally true in real life, and the implications of this are worth discussing. A story for another day.} that the repeated trials are {\it i.i.d.} (independent and identically distributed) with mean $\mu$ and variance $\sigma^2$. We can invoke\footnote{The CLT states that as the sample size increases toward infinity, the sampling distribution of $\bar Y$ converges to a normal distribution. We never have infinite sample sizes, but as a rule of thumb, this approximation works well for $n \ge 30$ (depending on multiple factors). Another story for another day.} the Central Limit Theorem (CLT) to approximate the distribution of the average performance $\bar Y$ as:
+    \begin{equation}
+      \label{eqn-likelihood}
+      \bar Y = \frac{Y_1 + Y_2 + ... + Y_n}{n} \sim \mbox{Normal}(\mu, \sigma^2 / n).
+    \end{equation}
+
+    We interpret $\mu$ as the {\it true talent} of the athlete, and $\sigma^2$ is the noise associated with using observed performance to measure true talent in a single trial. The objective of regression to the mean is estimating $\mu$. In the field of statistics, there are broadly two schools of thought for how to do this:
+    \begin{enumerate}
+      \item The {\it Frequentist} approach is to think of $\mu$ as a fixed, unknown value. Under this paradigm, the most logical estimate for $\mu$ is the value that would be most likely to have generated the observed data $\bar Y$. In this case, that value is $\bar Y$, so the Frequentist estimate is $\hat \mu = \bar Y$. This is known as the {\it maximum likelihood estimate} (MLE).
+      \item The {\it Bayesian} approach is to think of $\mu$ as an uknown random variable itself. This requires that we specify a probability distribution for $\mu$ before observing any data. This is known as the {\it prior distribution}. Using the prior distribution and the likelihood of the observed data, we use Bayes' Rule to calculate the {\it posterior distribution} of $\mu$, i.e. a distribution that represents our uncertainty about $\mu$ after observing the data.
+    \end{enumerate}
+
+    For the problem of estimating athlete true talent, the Bayesian approach has advantages over the Frequentist approach. For example, consider a basketball player who attempts five 3-point field goals and makes all of them, a 3-point field goal percentage of 100\%. Intuitively, 100\% (the Frequentist estimate) is an absurd estimate for the player's true talent, especially based on such a small sample. The player would have to maintain that performance over a much larger sample to convince us that their true talent is close to a 100\% field goal percentage. This intuition is exactly what the Bayesian approach captures.
+
+  \subsection{\sc The Bayesian Posterior Distribution}
+
+    As noted in the previous section, the Bayesian approach requires that we specify a prior distribution on the athlete's true talent $\mu$. Fortunately, there is a natural choice for this prior: the distribution of true talent across a population of relevant population of athletes (e.g. all players in the same league). This corresponds with our intuitive skepticism that an outlier performance represents an outlier talent. The prior distribution is a mathematical formalization of our intuition that outlier true talent is rare.
+
+    Let us assume that the population distribution of true talent is normal with mean $\mu_0$ and variance $\sigma^2_0$. We use this as our prior distribution for $\mu$:
+    \begin{equation*}
+      \mu \sim \mbox{Normal}(\mu_0, \sigma^2_0).
+    \end{equation*}
+    Suppose we observe the value $\bar y$ for the random variable $\bar Y$. Using Bayes' Rule\footnote{We omit the details of this calculation. You can learn this in STAT 425.}, we can combine the prior distribution with the likelihood from equation (\ref{eqn-likelihood}) calculate the posterior distribution of $\mu$ given $\bar Y = \bar y$:
+    \begin{equation}
+      \label{eqn-posterior}
+      \mu \mid \bar Y = \bar y \sim \mbox{Normal}\left(\frac{(n / \sigma^2) \bar y + (1 / \sigma^2_0) \mu_0}{(n / \sigma^2) + 1 / \sigma^2_0},\, \frac{1}{n / \sigma^2 + 1 / \sigma^2_0}\right).
+    \end{equation}
+    The mean of this posterior distribution is our formula for regression to the mean. It is the weighted average of the observed performance ($\bar y$) and the population mean ($\mu_0$), and each is weighted according to the inverse of its variance. We make the following observations:
+    \begin{enumerate}
+      \item  As the population variance ($\sigma^2_0$) decreases, we put more weight on the population mean ($\mu_0$) because we have greater confidence that all players are close to the population mean.
+      \item As the noise variance ($\sigma^2 / n$) decreases, we put more weight on the observed performance ($\bar y$) because we have greater confidence that the observed performance reflects true talent.
+      \item Our posterior mean matches equation (\ref{eqn-regression-to-mean}) with $c = \sigma^2 / \sigma^2_0$.
+    \end{enumerate}
+  
+    We get $\bar y$ and $n$ from our data, but we still need $\sigma^2$, $\mu_0$ and $\sigma^2_0$ to perform regression to the mean. We can estimate $\sigma^2$ using the standard unbiased estimator for variance based on a sample of size $n$:
+    \begin{equation}
+      \label{eqn-noise-variance}
+      \hat \sigma^2 = \frac{\sum_{i = 1}^n (y_i - \bar y)^2}{n - 1}.
+    \end{equation}
+    Estimating the population mean $\mu_0$ is similarly easy: We calculate the average performance across all players in the league and use this as an estimate of the population mean true talent (denoted by $\hat \mu_0$). Because it is based on a league's worth of data, $\hat \mu_0$ is very low-noise. This method of estimating the parameter of a prior distribution using observed data is called {\it empirical Bayes}. We use empirical Bayes to estimate $\sigma^2_0$ as well.
+
+  \subsection{\sc Estimating the Population Variance}
+
+    To understand the intuition for this section, we go back to equation (\ref{eqn-talent-plus-luck}). If performance is talent plus luck; and luck is independent of talent; then the variance of performance is the variance of talent plus the variance of luck. The variance of talent is what we are after:
+    \begin{equation*}
+      \mbox{Var(Talent) = Var(Performance) -- Var(Luck)}.
+    \end{equation*}
+
+    To formalize this, we follow Tango et al. (2006).\footnote{Tango, Lichtman and Dolphin (2014). {\it The Book: Playing the Percentages in Baseball.} TMA Press.} First, we expand our notation to include multiple players. Let $\bar Y_j$ be a random variable representing the performance of player $j$ with true talent $\mu_j$ in $n_j$ trials, for $j = 1, 2, ..., n$. We assume that the player true talents $\mu_j$ are i.i.d. Normal$(\mu_0, \sigma^2_0)$ and that $\bar Y_j | \mu_j \sim \mbox{Normal}(\sigma^2 / n_j)$ for $j = 1, 2, ..., n$. By combining these two distributional assumptions, we can calculate the marginal distribution of $\bar Y_j$:
+    \begin{equation*}
+      \bar Y_j \sim \mbox{Normal}(\mu_0,\, \sigma^2_0 + \sigma^2 / n_j).
+    \end{equation*}
+
+    We can use this to calculate an unbiased estimator for $\sigma^2_0$:
+    \begin{equation*}
+      \hat\sigma^2_j = (\bar Y - \mu_0)^2 - \sigma^2 / n_j.
+    \end{equation*}
+    We have subtracted the variance in luck ($\sigma^2 / n_j$) from a point estimate of the variance in performance ($(\bar Y - \mu_0)^2$). The problem with this estimator is that it is very noisy because it is based on a single player's performance. We can reduce the noise by averaging the estimates across all players, but we want to weight each point estimate by the inverse of its variance. To calculate the variance of $\hat\sigma^2_j$, we rely on two observations:
+    \begin{enumerate}
+      \item $(\bar Y - \mu_0)^2 / (\sigma^2_0 + \sigma^2 / n_j)$ is a chi-square random variable with one degree of freedom (variance = 2).
+      \item $\sigma^2 / n_j$ is fixed (variance = 0).
+    \end{enumerate}
+
+    Putting these two observations together, we calculate the variance of $\hat \sigma^2_j$:
+    \begin{align*}
+      \mbox{Var}(\hat\sigma^2_j)  &= \mbox{Var}((\bar Y - \mu_0)^2 - \sigma^2 / n_j)\\
+                                  &= \mbox{Var}((\bar Y - \mu_0)^2) & \mbox{\it (Observation \#1)}\\
+                                  &= (\sigma^2_0 + \sigma^2 / n_j)^2 \cdot \mbox{Var}((\bar Y - \mu_0)^2 / (\sigma^2_0 + \sigma^2 / n_j))\\
+                                  &= (\sigma^2_0 + \sigma^2 / n_j)^2 \cdot 2 & \mbox{\it (Observation \#2)}
+    \end{align*}
+    And then we combine the point estimates $\hat\sigma^2_j$ into a weighted mean:
+    \begin{equation}
+      \label{eqn-population-variance}
+      \hat\sigma^2_0 = \frac{\sum_{j = 1}^p \hat\sigma^2_j / (\sigma^2_0 + \sigma^2 / n_j)^2}{\sum_{j = 1}^p 1 / (\sigma^2_0 + \sigma^2 / n_j)^2}.
+    \end{equation}
+
+    But we have a problem! Our estimator for $\sigma^2_0$ depends on $\sigma^2_0$. This is circular. Fortunately, the equation is not too sensitive to the value of $\sigma^2_0$. The solution is to initiate $\hat\sigma^2_0$ to some value and iteratively update $\hat\sigma^2_0$ until convergence. We also make the substitution $\sigma^2 \leftarrow \hat\sigma^2$ from equation (\ref{eqn-noise-variance}). The update step becomes:
+    \begin{equation}
+      \label{eqn-population-variance-update}
+      (\hat\sigma^2_0)^{(t + 1)} = \frac{\sum_{j = 1}^p \hat\sigma^2_j / \left((\hat\sigma^2_0)^{(t)} + \hat\sigma^2 / n_j\right)^2}{\hat\sum_{j = 1}^p 1 / \left((\hat\sigma^2_0)^{(t)} + \hat\sigma^2 / n_j\right)^2}.
+    \end{equation}
+
+
+
+\end{document}
