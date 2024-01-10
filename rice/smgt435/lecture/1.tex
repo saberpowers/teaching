@@ -1,0 +1,50 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+  \section{\sc Pythagorean Formula}
+
+    \subsection{\sc When do we switch to preferring actual winning percentage?}
+
+      $n_i$ is the number of games played by team $i$\\
+      $X_i$ is the Pythag W\% of team $i$\\
+      $Y_i$ is the actual W\% of team $i$\\
+      $Z_i$ is the residual W\% of team $i$ ($Y_i = X_i + Z_i$)
+
+      \subsubsection*{\sc Intuition}
+
+      \begin{align*}
+        \mbox{Actual W\%} &= \mbox{Pythag W\%} + \mbox{Residual}\\
+        \mbox{Outcome} &= \mbox{Skill} + \mbox{Luck}\\
+        Y_i &= X_i + Z_i
+      \end{align*}
+
+      \subsubsection*{\sc Model}
+
+      \begin{align*}
+        X_i &\sim \mbox{ind. Normal}(\mu_i,\, \sigma^2_X / n_i)\\
+        \mu_i &\sim \mbox{i.i.d. Normal}(0,\, \sigma^2_\mu)
+      \end{align*}
+
+      Option \#1 ($Z_i$ is all luck):
+      \begin{equation*}
+        Z_i \sim \mbox{i.i.d. Normal}(0,\, \sigma^2_Z / n_i)
+      \end{equation*}
+
+      Option \#2 ($Z_i$ is not purely luck):
+      \begin{align*}
+        Z_i &\sim \mbox{ind. Normal}(\eta_i,\, \sigma^2_Z / n_i)\\
+        \mu_i &\sim \mbox{i.i.d. Normal}(0,\, \sigma^2_\eta)
+      \end{align*}
+
+      One can show that $X_i$ does better than $Y_i$ at estimating $E[Y_i]$ if $\sigma^2_\eta < \sigma^2_Z / n$, i.e. $n < \sigma^2_Z / \sigma^2_\eta$.
+
+    \subsection{Exercises}
+    
+    \begin{enumerate}
+      \item Show that $X_i$ does better than $Y_i$ at estimating $E[Y_i]$ if $n < \sigma^2_Z / \sigma^2_\eta$.
+    \end{enumerate}
+
+\end{document}
