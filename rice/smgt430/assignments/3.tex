@@ -1,0 +1,59 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+  \section*{\sc Assignment \#3: Pythagorean Formula}
+
+    Your task is to evaluate the effectiveness of the Pythagorean formula in the sports league of your choice.
+  
+    \subsection*{\sc Why are you being asked to do this?}
+
+      Fundamentally, the question we are trying to answer is: {\it How much do we want to pay attention to win-loss record v. score differential?} The answer to this question varies by sport and by league, and it will drive the modeling decisions we make on future assignments.
+
+    \subsection*{\sc What (exactly) are you being asked to do?}
+
+      Find a dataset of game scores from a completed league or competition of your choice. Use these data to estimate the optimal exponent $\alpha$ within the Pythagorean formula for predicting winning percentage in this league. Report the value of $\alpha$ you obtained. Split your dataset into two equal-sized subsets, and then answer the following questions:
+      \begin{itemize}
+        \item How well does first-half {\bf actual} winning percentage predict second-half {\bf actual} winning percentage? Report the correlation and create a plot to illustrate the relationship between these two variables.
+        \item How well does first-half {\bf Pythag} winning percentage predict second-half {\bf actual} winning percentage? Report the correlation and create a plot to illustrate the relationship between these two variables.
+        \item How well does first-half {\bf residual} winning percentage predict second-half {\bf residual} winning percentage? Report the correlation and create a plot to illustrate the relationship between these two variables. {\it Residual winning percentage is actual winning percentage minus Pythag winning percentage. We are investigating how much signal there is in a team's over-/under-performance of its Pythag record.}
+      \end{itemize}
+      
+      Finally, {\bf escape from model land} by interpreting your results in the context of the real world. You need NOT address all of these, but here are examples of questions you may consider addressing: {\it Why might this model be an inadequate representation of reality? What decision in sport management might be affected by this analysis? How might this analysis change the way fans think about the sport?}
+
+      \subsubsection*{\sc Submission Requirements}
+
+        \begin{itemize}
+          \item A PDF report (max 2 pages) summarizing your findings, including at minimum the following:
+          \begin{itemize}
+            \item a description of the league and dataset you chose
+            \item the value of $\alpha$ you estimated for the Pythagorean formula using your data
+            \item the correlations between the requested variables
+            \item three plots illustrating the relationships between the requested variables
+            \item an interpretation of your results in the context of the real world
+          \end{itemize}
+          \item An R script that contains all of the code you used to perform the analysis
+        \end{itemize}
+
+      \subsubsection*{\sc Reminders}
+
+        \begin{itemize}
+          \item Prepare your report as if your audience is a front office executive who has not seen the assignment prompt. Write clearly and concisely, and format your report in a way that makes it easy to read.
+          \item In this class we value exercising {\bf creativity} on homework assignments! Look for opportunities to put your own personal touch on your work---try to do more than parrot what you've been taught.
+          \item Please {\bf anonymize} your submission by removing any personally identifiable information (including file paths in your R script that contain things like a username!).
+        \end{itemize}
+
+    \subsection*{\sc How will your grade be determined?}
+
+      You will get feedback on your work product based on several criteria. Within each of those criteria, the feedback will be: Missing (0\%), Needs Improvement (70\%), Good (85\%) or Exceeds Expectations (100\%). Your grade on the assignment will be the average of the grades across criteria. The criteria are:
+      \begin{enumerate}
+        \item {\bf Data modeling.} Did you correctly estimate the optimal exponent $\alpha$ in the Pythagorean formula? Did you correctly report the correlations between the requested variables?
+        \item {\bf Data visualization.} Did you create plots to visualize the relationships between the requested variables? Are the plots aesthetically designed and easy to read?
+        \item {\bf Creative thinking.} Did you bring your own ideas from outside of this class to bear on the assignment?
+        \item {\bf Critical thinking.} Did you escape from model land? Did you weigh evidence from multiple perspectives in forming your conclusion? Did you provide a thoughtful interpretation of your results?
+        \item {\bf Written communication.} Did you write clearly and concisely? Did you organize your key ideas with the evidence supporting them? Did you format your report in a way that makes it easy to read?
+      \end{enumerate}
+
+\end{document}

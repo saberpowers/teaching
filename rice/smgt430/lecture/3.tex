@@ -70,13 +70,14 @@
   \end{equation*}
 
   We interpret $\hat\beta_j$, the element of $\boldsymbol{\hat\beta}$ corresponding to team $j$, to be the estimated strength of team $j$. A satisfying property of these estimated strengths is that they are a steady-state solution to equation (\ref{eqn-adjusted-point-differential}), meaning:
-  \begin{equation*}
+  \begin{equation}
+    \label{eqn-satisfying-property}
     \hat\beta_j = \frac{
       \sum_{i=1}^n x_{ij} \cdot y_i + \hat\beta_{o_{ij}}
     }{
       \sum_{i=1}^n x_{ij}^2
     }.
-  \end{equation*}
+  \end{equation}
   In other words, $\hat\beta_j$ is equivalent to the score differential for team $j$ after adjusting for strength of schedule, where team strengths are defined by $\boldsymbol{\hat\beta}$.
 
   \subsection{\sc Modeling Win-Loss Outcome}

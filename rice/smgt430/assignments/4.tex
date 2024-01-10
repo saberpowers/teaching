@@ -1,0 +1,58 @@
+
+\documentclass{article}
+\include{preamble.sty}
+
+\begin{document}
+
+  \section*{\sc Assignment \#4: Bradley-Terry Model}
+
+    Your task is to apply the Bradley-Terry model on a dataset from the active sport of your choice.
+  
+    \subsection*{\sc Why are you being asked to do this?}
+
+      The best way to check how well you've learned something is to try doing it yourself. We have already covered the code to implement this method in class. Successfully fitting the Bradley-Terry model on a new dataset will require you to wrangle the data and make necessary adaptations based on the unique challenges of your data. You will practice two competencies: (a) applying a model to a new dataset and (b) interpreting the results to inform decision-making in the real world.
+
+    \subsection*{\sc What (exactly) are you being asked to do?}
+
+      Find a dataset of game scores for a league or competition {\it that is currently under way}. You may use historical data if you have a compelling reason. Fit the Bradley-Terry model to your data to estimate the strength of each team. Report a ranking of the top teams in the league (are there any surprises?). Pick an upcoming game of interest to you, and use your model to predict the outcome of that game (what do you think of this prediction?). Create a data visualization that tells a story about some aspect of your results.
+
+      Finally, {\bf escape from model land} by interpreting your results in the context of the real world. You need NOT address all of these, but here are examples of questions you may consider addressing: {\it Why might this model be an inadequate representation of reality? What decision in sport management might be affected by this analysis? How might this analysis change the way fans think about the sport?}
+
+      \subsubsection*{\sc Submission Requirements}
+
+        \begin{itemize}
+          \item A PDF report (max 2 pages) summarizing your findings, including at minimum the following:
+          \begin{itemize}
+            \item a ranking of the top teams in the league, according to your model
+            \item a prediction for an upcoming game of interest to you
+            \item a data visualization that tells a story about some aspect of your results
+            \item an interpretation of your results in the context of the real world
+          \end{itemize}
+          \item An R script that contains all of the code you used to perform the analysis
+        \end{itemize}
+
+      \subsubsection*{\sc Reminders}
+
+        \begin{itemize}
+          \item Prepare your report as if your audience is a front office executive who has not seen the assignment prompt. Write clearly and concisely, and format your report in a way that makes it easy to read.
+          \item In this class we value exercising {\bf creativity} on homework assignments! Look for opportunities to put your own personal touch on your work---try to do more than parrot what you've been taught.
+          \item Please {\bf anonymize} your submission by removing any personally identifiable information (including file paths in your R script that contain things like a username!).
+        \end{itemize}
+
+      \subsubsection*{\sc Extra Credit}
+
+        You may earn one percentage point of extra credit tacked on to your final semester grade by submitting (in a separate PDF file) a proof of equation (4) in Section 3.1 of the lecture notes. In other words, prove that $\hat\beta_j$ is equivalent to the score differential for team $j$ after adjusting for strength of schedule, where team strengths are defined by $\boldsymbol{\hat\beta}$.
+
+    \subsection*{\sc How will your grade be determined?}
+
+      You will get feedback on your work product based on several criteria. Within each of those criteria, the feedback will be: Missing (0\%), Needs Improvement (70\%), Good (85\%) or Exceeds Expectations (100\%). Your grade on the assignment will be the average of the grades across criteria. The criteria are:
+      \begin{enumerate}
+        \item {\bf Team rankings.} Did you correctly implement the Bradley-Terry model and report a ranking of top teams (including estimated strengths)? Did you make any interesting observations about the results?
+        \item {\bf Game prediction.} Did you correctly extract the model prediction for an upcoming game of interest to you? Did you explain whether you thought the prediction was on point or off target?
+        \item {\bf Data visualization.} Did you include a plot that tells a worthwhile story about your results? Is that story easy to understand from a quick glance at your plot?
+        \item {\bf Creative thinking.} Did you bring your own ideas from outside of this class to bear on the assignment?
+        \item {\bf Critical thinking.} Did you escape from model land? Did you weigh evidence from multiple perspectives in forming your conclusion? Did you provide a thoughtful interpretation of your results?
+        \item {\bf Written communication.} Did you write clearly and concisely? Did you organize your key ideas with the evidence supporting them? Did you format your report in a way that makes it easy to read?
+      \end{enumerate}
+
+\end{document}

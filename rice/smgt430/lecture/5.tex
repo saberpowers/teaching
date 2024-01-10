@@ -93,7 +93,6 @@
   \end{equation*}
   In this case we would use REML to estimate the model. The second option is to keep the model as-is but use ridge regression to estimate the model:
   \begin{equation*}
-    \label{eqn-ridge-regression}
     \boldsymbol{\hat\beta} = \arg\min_{\boldsymbol{\beta}} \left\{ \sum_{i=1}^n (y_i - (\beta_0 + \beta_{p_i}))^2 + \lambda \sum_{j = 1}^p \beta_j^2 \right\}.
   \end{equation*}
   In this case we would use cross-validation or some other method to choose $\lambda$, at which point we have a closed-form expression for the estimated regression coefficients. Given the existence of software packages to implement LMER and ridge regression, framing regression to the mean this way may lead to easier implementation than the method we derived in Chapter ??.
