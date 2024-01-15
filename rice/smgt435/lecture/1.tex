@@ -4,6 +4,10 @@
 
 \begin{document}
 
+  \begin{framed}
+    {\bf Caution:} These lecture notes are under construction. You may find parts that are incomplete.
+  \end{framed}
+
   \section{\sc Pythagorean Formula}
 
     \subsection{\sc When do we switch to preferring actual winning percentage?}
@@ -25,7 +29,7 @@
 
       \begin{align*}
         X_i &\sim \mbox{ind. Normal}(\mu_i,\, \sigma^2_X / n_i)\\
-        \mu_i &\sim \mbox{i.i.d. Normal}(0,\, \sigma^2_\mu)
+        \mu_i &\sim \mbox{i.i.d. Normal}(\mu_0,\, \sigma^2_\mu)
       \end{align*}
 
       Option \#1 ($Z_i$ is all luck):
@@ -36,12 +40,12 @@
       Option \#2 ($Z_i$ is not purely luck):
       \begin{align*}
         Z_i &\sim \mbox{ind. Normal}(\eta_i,\, \sigma^2_Z / n_i)\\
-        \mu_i &\sim \mbox{i.i.d. Normal}(0,\, \sigma^2_\eta)
+        \eta_i &\sim \mbox{i.i.d. Normal}(0,\, \sigma^2_\eta)
       \end{align*}
 
       One can show that $X_i$ does better than $Y_i$ at estimating $E[Y_i]$ if $\sigma^2_\eta < \sigma^2_Z / n$, i.e. $n < \sigma^2_Z / \sigma^2_\eta$.
 
-    \subsection{Exercises}
+    \subsection{\sc Exercises}
     
     \begin{enumerate}
       \item Show that $X_i$ does better than $Y_i$ at estimating $E[Y_i]$ if $n < \sigma^2_Z / \sigma^2_\eta$.

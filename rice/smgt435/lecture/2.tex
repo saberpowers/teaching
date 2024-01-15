@@ -1,29 +1,108 @@
 
 \documentclass{article}
-
-\usepackage[margin=1in]{geometry}
+\input{preamble.sty}
 
 \begin{document}
+
+\begin{framed}
+  {\bf Caution:} These lecture notes are under construction. You may find parts that are incomplete.
+\end{framed}
 
   \setcounter{section}{1}
   \section{\sc Base-Out Run Expectancy and Linear Weights}
 
     In Chapter ??, we learned where wins come from: Wins are composed of runs. But where do runs come from? That is the focus of this chapter.
 
-    \subsection{\sc Base-Out Run Expectancy}
+    \subsection{\sc Markov Chain Model}
 
       Baseball is often described as a sport that lends itself particularly well to statistical analysis. The primary reason is that a baseball game is composed of discrete events. First, one batter faces one pitcher, resulting in an outcome. Then, a second batter comes to the plate and produces a new outcome. And so on. This makes it relatively straightforward to isolate the impact of individual players on the number of runs scored by either team. The first building block of this analysis is the {\it base-out run expectancy}: Given the bases occupied and the number of outs, what is the expected number of runs that will score in the remainder of the inning?
 
-      To define base-out run expectancy mathematically, we start with the {\it Markov chain} model. A Markov chain is a probability model consisting of states and probabilities of transitioning between each pair of states. We observe a sequence of states, and the probability of transitioning from one state to the next depends only on the current state. When using a Markov chain to model data, how we define the state is important modeling decision. We want the state to include all of the information necessary for determining the probabilities of transitioning to each possible subsequent state, and at the same time we prefer a simpler, more parsimonious model.
+      To define base-out run expectancy, we start with the {\it Markov chain} model. A Markov chain is a probability model consisting of a set $\mathcal S$ of states and a transition probability function $p : \mathcal S \times \mathcal S \rightarrow [0, 1]$ between the states. We observe a sequence of states, and the probability of transitioning from one state to the next depends only on the current state. When using a Markov chain to model data, how we define the state is important modeling decision. We want the state to include all of the information necessary for determining the probabilities of transitioning to each possible subsequent state, and at the same time we prefer a simpler, more parsimonious model.
 
-      In baseball, the most common application of the Markov chain model is to describe the progression of an inning as a sequence of static states between plate appearances. Let's define the {\it base-out state} to be $(b_1, b_2, b_3, o)$, where $b_i \in \{0, 1\}$ indicates whether base $i$ is occupied, for $i \in \{1, 2, 3\}$; and $o \in \{0, 1, 2, 3\}$ represents the number of outs at the beginning of a plate appearance. The only state for which $o = 3$ is $(0, 0, 0, 3)$, the terminal state (end of inning). Thus there are a total of 25 $(= 2 \times 2 \times 2 \times 3 + 1)$ base-out states: one for each combination of bases occupied and outs (for outs less than three), plus the terminal state. Every inning starts in state $(0, 0, 0, 0)$.
+      In baseball, the most common application of the Markov chain model is to describe the progression of an inning as a sequence of static states between plate appearances. We define the {\it base-out state} to be $(b_1, b_2, b_3, o)$, where $b_k \in \{0, 1\}$ indicates whether base $k$ is occupied, for $k \in \{1, 2, 3\}$; and $o \in \{0, 1, 2\}$ represents the number of outs at the beginning of a plate appearance. Every inning starts in state $(0, 0, 0, 0)$. In addition to the 24 $(= 2 \times 2 \times 2 \times 3)$ non-terminal states, we need five terminal states $(r)$ for $r \in \{0, 1, 2, 3, 4\}$ (corresponding to the number of runs scored on the final transition---necessary for calculations below).
 
-      With the state defined, what remains is to define the transition probabilities between states. One could approach this different ways, but the most common approach is to use the empirical transition probabilites observed in a chosen dataset. For example, if we observe the state $(0, 0, 1, 0)$ 100 times in our dataset, and 60 of those times the next state is $(0, 0, 1, 1)$, then our estimated transition probability from $(0, 0, 1, 0)$ to $(0, 0, 1, 1)$ is 60\%. Because we are often working with big samples of data (the typical MLB regular season has approximately 170,000 plate appearances), these empirical transition probabilities are generally reasonable estimates. We will use $p(s, s')$ to denote the probability of transitioning from state $s$ to state $s'$, and we will use $P$ to denote the 25-by-25 matrix of transition probabilities.
+      With the state defined, what remains is to define the transition probabilities between states. One could approach this different ways, but the most common approach is to use the empirical transition probabilites observed in a chosen dataset. For example, if we observe the state $(0, 0, 1, 0)$ 100 times in our dataset, and 60 of those times the next state is $(0, 0, 1, 1)$, then our estimated transition probability from $(0, 0, 1, 0)$ to $(0, 0, 1, 1)$ is 60\%. Because we are often working with big samples of data (the typical MLB regular season has approximately 170,000 plate appearances), these empirical transition probabilities are generally reasonable estimates. We will use $p(s, s')$ to denote the probability of transitioning from state $s$ to state $s'$.
 
-      Given this formulation of the Markov chain model, we can leverage properties of the Markov chain to calculate base-out run expectancy.
+    \subsection{\sc Base-Out Run Expectancy}
 
-    \subsection{\sc RE24}
+      Using the Markov chain model for the progression of an inning, we can calculate the expected number of runs scored from any base-out state to the end of the inning. We use $r(s, s')$ to denote the reward (i.e. the number of runs scored) on the transition from state $s$ to state $s'$. We can write it as follows:
+      \begin{align*}
+        r(s, s') = \begin{cases}
+          (b_1 + b_2 + b_3 + o) + 1 - (b_1' + b_2' + b_3' + o') & \mbox{if $s'$ is not terminal}\\
+          r' & \mbox{if $s'$ is terminal}
+        \end{cases}
+      \end{align*}
+      We use $v(s)$ to denote the value (i.e. the rest-of-inning run expectancy) of state $s$. The value function satisfies the following recursive relationship (a simplified version of the Bellman equation):
+      \begin{align*}
+        v(s) = \sum_{s' \in \mathcal{S}} p(s, s') \{r(s, s') + v(s')\}
+      \end{align*}
+      To calculate $v(\cdot)$, we initialize $v(s) = 0$ for all $s \in \mathcal{S}$ and then iterate the above equation until convergence.
 
-    \subsection{\sc Linear Weights}
+    \subsection{\sc Player Evaluation}
+
+      \subsubsection{\sc RE24}
+
+        We come to our first player evaluation metric of the course. From $v(\cdot)$ we have the run expectancy of each base-out state. RE24 is the change in run expectancy averaged across a batter's plate appearances:
+        \begin{equation*}
+          \text{RE24}(b) = \frac{
+            \sum_{i = 1}^n \mathbb{I}\{b_i = b\} (r_i + v(s_i') - v(s_i))
+          }{
+            \sum_{i = 1}^n \mathbb{I}\{b_i = b\}
+          }.
+        \end{equation*}
+
+      \subsubsection{\sc Linear Weights}
+
+        To calculate linear weights, we start with a similar calculation to RE24, but we average the change in run expectancy within outcome, rather than within batter. The linear weight of outcome $o$ is given by:
+        \begin{equation*}
+          \ell(o) = \frac{
+            \sum_{i = 1}^n \mathbb{I}\{o_i = o\} (r_i + v(s_i') - v(s_i))
+          }{
+            \sum_{i = 1}^n \mathbb{I}\{o_i = o\}
+          }.
+        \end{equation*}
+
+        Once we have the linear weight $\ell(\cdot)$ of each outcome, the metric LW is simply the average of these linear weights across a batter's plate appearances:
+        \begin{equation*}
+          \text{LW}(b) = \frac{
+            \sum_{i = 1}^n \mathbb{I}\{b_i = b\} \ell(o_i)
+          }{
+            \sum_{i = 1}^n \mathbb{I}\{b_i = b\}
+          }.
+        \end{equation*}
+
+        \begin{framed}
+          {\sc Discussion:} What are the advantages and disadvantages of RE24 and LW relative to each other?
+        \end{framed}
+    
+    \subsection{\sc Regression to the Mean}
+
+      There is an analogy to be drawn between the RE24/LW relationship and the relationship between winning percentage and Pythagorean record from the previous chapter. Just like winning percentage, RE24 is measurement that carries more descriptive meaning (it measures what actually matters). Just like Pythagorean record, LW is a more stable measurement. We saw in the previous chapter that Pythagorean record is a better predictor of future winning percentage than winning percentage itself (unless the sample size is more than several hundred games). One might ask a similar question for RE24 and LW: When do we switch to preferring RE24 over LW?
+
+      Let's instead acknowledge that the question presents a false dichotomy. A better question is: {\it How can we use both RE24 and LW to best predict future RE24?} This is where regression to the mean comes in. Recycling notation from the previous chapter, for batter $j \in \{1, ..., p\}$, we use $n_j$ to denote the number of plate appearances, and we use the random variable $Z_j$ to represent the residual $RE24(j) - LW(j)$.
+      \begin{align*}
+        Z_j &\sim \mbox{Normal}(\eta_j,\, \sigma^2_Z / n_j)\\
+        \eta_j &\sim \mbox{Normal}(0,\, \sigma^2_\eta).
+      \end{align*}
+
+      Recognizing this as a Bayesian model, we can use Bayes' rule to derive the posterior distribution of $\eta_j$ given $Z_j = z_j$:
+      \begin{align*}
+        \eta_j \mid Z_j = z_j \sim \mbox{Normal}\left(\frac{n_j / \sigma^2_Z \cdot z_j}{n_j / \sigma^2_Z + 1 / \sigma^2_\eta},\, \frac{1}{n_j / \sigma^2_z + 1 / \sigma^2_\eta}\right).
+      \end{align*}
+
+      In the previous chapter, we chose between ignoring the residual or fully including it in our prediction:
+      \begin{align*}
+        X_j = X_j + 0 \hspace{1cm} \mbox{vs.} \hspace{1cm} Y_j = X_j + Z_j
+      \end{align*}
+      Now we have derived a third option that is a weighted average of the two extremes:
+      \begin{align*}
+        X_j + \frac{n_j / \sigma^2_Z \cdot Z_j}{n_j / \sigma^2_Z + 1 / \sigma^2_\eta}.
+      \end{align*}
+      As opposed to making a sudden switch from one extreme to the other, this third estimator smoothly transitions from ignoring the residual to giving it full weight. We make the following observations:
+      \begin{enumerate}
+        \item When $n_j = \sigma^2_Z / \sigma^2_\eta$ (the point at which our preference between $X_j$ and $Y_j$ flips in the previous chapter), our estimator is $X_j = Z_j / 2$.
+        \item As $n_j \rightarrow \infty$, our estimator converges to $Y_j = X_j + Z_j$.
+        \item As $n_j \rightarrow 0$, our estimator converges to $X_j$.
+      \end{enumerate}
 
 \end{document}

@@ -119,7 +119,7 @@ for (b in 1:B) {
 
   bootstrap_sample <- game |>
     dplyr::slice(sample(1:nrow(game), size = nrow(game), replace = TRUE)) |>
-    calculate_record() |>
+    calculate_record(alpha = 1.72) |>
     dplyr::mutate(
       win_pct_actual = wins / games,
       win_pct_pythag = runs_scored^alpha / (runs_scored^alpha + runs_allowed^alpha),
@@ -139,7 +139,7 @@ sd_residual_noise <- bootstrap_data |>
 
 # Step 5: Calculate signal variance of residual winning pct ----
 
-sd_residual_signal <- sqrt(mean(win_pct$residual_win_pct^2) - sd_residual_noise^2)
+sd_residual_signal <- sqrt(mean(data$win_pct_residual^2) - sd_residual_noise^2)
 
 
 # Step 6: Calculate sample size at which we prefer actual winning pct ----
