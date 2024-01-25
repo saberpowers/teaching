@@ -1,0 +1,65 @@
+
+\documentclass{article}
+
+\input{preamble.sty}
+
+\begin{document}
+
+\setcounter{section}{2}
+\section{\sc Batted Ball Outcome Model}
+
+  In the first chapter, we discussed where wins come from. Wins come from runs. In the second chapter, we discussed where runs come from. Runs come from plate appearance outcomes (walks, singles, etc.). In this chapter (you guessed it!) we will discuss where plate appearance outcomes come from.
+
+  \subsection{\sc Tracking Data}
+
+    In 2009, a company called Sportvision introduced a product to MLB called HITf/x. This product was a camera system that used computer vision to track the baseball after it was hit by the batter. The implications were huge. So often, a batter will hit a weak ground ball that luckily finds space between two fielders (reflecting luck, not a repeatable skill). ``That's a hit in the scorebook,'' announcers would say. Or a batter will hit a line drive right at a fielder. The announcers are right---in the scorebook, we have no way of distinguishing between different types of singles or different types of flyouts. With batted ball tracking, now we do more to distinguish between skill and luck on batted balls.
+
+    The California-based Sportvision was usurped ca. 2015 by a Danish company called TrackMan\footnote{TrackMan got their start in golf. Many sports tech companies start in golf because enthusiasts often have disposable income.} whose technology was based on Doppler radar. TrackMan was usurped ca. 2020 by a London-based company called Hawk-Eye,\footnote{Hawk-Eye got their start in tennis. They were the ones responsible for the in/out replay challenges you've seen on TV.} who reverted us to computer vision. For the most part, the data we observe for each batted ball are the exit speed, the launch angle and the spray angle. The exit speed is the speed of the ball as it leaves the bat. The launch angle is the initial vertical angle of the ball trajectory off the bat. The spray angle is the horizontal angle of the initial trajectory. MLB teams have access to additional data (ball spin, hang time, distance, etc.), but none of those data are publicly available.\footnote{Incidentally, the fact that even these data are publicly available is a happy accident. MLB left an API intended for media companies exposed to the public, and they decided to leave it as is after it was discovered by the public.}
+
+  \subsection{\sc Outcome Model}
+
+    Suppose we observe a dataset of $n$ batted balls indexed by $i \in \{1, ..., n\}$. For each batted ball, we observe the batter $b_i$, the exit speed $x_{i1}$, the launch angle $x_{i2}$, the spray angle $x_{i3}$, and the outcome $o_i$. We use $y_i$ to denote the linear weight of the outcome $o_i$; in the notation of the previous chapter, $y_i = \ell(o_i)$. We use $Y_i$ to denote the random variable of which $y_i$ is an observation. We will present three different probability models for $Y_i$, starting with Model \#3 (for notational reasons that will become clear).
+    \begin{equation*}
+      \mbox{Model \#3: }Y_i \sim \mbox{Normal}\left(f_3(x_{i1}, x_{i2}, x_{i3}), \sigma^2\right)
+    \end{equation*}
+    Model \#3 is a regression model. To fit the model, the task is estimating the function $f_3$. There are many methods for estimating $f_3$, one of which is linear regression, which finds the best function of the form:
+    \begin{equation*}
+      f_3(x_{i1}, x_{i2}, x_{i3}) = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_3 x_{i3}.
+    \end{equation*}
+    It turns out that strict linear regression is not well suited for this problem because (a) there are strongly nonlinear effects, especially for launch angle and (b) there are strong interactions between the covariates (e.g. exit speed and launch angle). We want a more flexible model, and there are many ways to achieve this. There is a whole subset of machine learning called {\it supervised regression} that is well suited for this problem, but it is outside the scope of this course.\footnote{You can learn about this in STAT 413.}
+
+  \subsection{\sc Player Evaluation}
+
+    Jumping ahead, suppose we have (one way or another) come up with an estimate $\hat f_3$ of $f_3$. Let's now introduce two competing metrics for batter evaluation.
+    \begin{align*}
+      \mbox{LW}(b) &= \sum_{i = 1}^n \mathbb{I}(b_i = b) \ell(o_i)\\
+      \mbox{xLW}_3(b) &= \sum_{i = 1}^n \mathbb{I}(b_i = b) \hat f_3(x_{i1}, x_{i2}, x_{i3})
+    \end{align*}
+    LW we have previously covered. xLW stands for expected linear weight. The x* prefix is a convention in sabermetrics for indicating that we are using batted ball trajectories rather than actual outcomes. The subscript 3 indicates that we are using Model \#3.
+
+    Which do we prefer between LW and $\mbox{xLW}_3$? This question is analogous to the one we faced when choosing between RE24 and LW. The metric $\mbox{xLW}_3$ introduces a restrictive assumption, that the batter only controls their LW through their batted ball trajectories. This assumption introduces bias into our batter evaluation, but the upshot is that it reduces variance. This is an example of the famous bias-variance tradeoff from statistical machine learning.\footnote{See STAT 413.} The short of it is that the optimal estimate of batter skill will lie somewhere between the extremes of high variance and high bias, and it depends on your sample size. The smaller the sample, the more bias you want. The larger your sample, the less bias you want. For tiny samples, we prefer $\mbox{xLW}_3$. For infinite samples, we prefer LW. Note that the decision between RE24 and LW was also an example of the bias-variance tradeoff (LW is higher bias, lower variance relative to RE24).
+    
+    Because we are facing the same problem as the previous two chapters, we use the same tools to solve it. Suppose we have batters $j \in \{1, ..., p\}$, each with $n_j$ plate appearances. Let the random variable $Z_j$ denote the per-PA residual $(\mbox{LW}(j) - \mbox{xLW}_3(j)) / n_j$ for batter $j$. Our model for $Z_j$ is:
+    \begin{align*}
+      Z_j &\sim \mbox{Normal}(\eta_j,\, \sigma^2_Z / n_j)\\
+      \eta_j &\sim \mbox{Normal}(0,\, \sigma^2_\eta).
+    \end{align*}
+    As the sample size increases, when do we switch from preferring $\mbox{xLW}_3$ to preferring LW? When $n > \sigma^2_Z / \sigma^2_\eta$ (see Chapter 1). What is our mean-regressed estimate of the ``true talent'' residual $\eta_j$? From Chapter 2:
+    \begin{equation*}
+      \frac{n_j / \sigma^2_Z \cdot z_j}{n_j / \sigma^2_Z + 1 / \sigma^2_\eta}.
+    \end{equation*}
+
+  \subsection{\sc Alternative Outcome Models}
+
+    Let's keep going down this path of reducing variance. First, we introduce two alternatives to Model \#3:
+    \begin{align*}
+      \mbox{Model \#2: }&Y_i \sim \mbox{Normal}\left(f_2(x_{i1}, x_{i2}), \sigma^2\right)\\
+      \mbox{Model \#1: }&Y_i \sim \mbox{Normal}\left(f_1(x_{i1}), \sigma^2\right)
+    \end{align*}
+    Model \#2 drops spray angle and only considers exit speed and launch angle. Model \#1 drops launch angle and only considers exit speed. Why would we do this? When we remove a covariate from the model, we increase the bias of the model and reduce its variance. Now we have a sequence of batter evaluation metrics with decreasing levels of bias and increasing levels of variance:
+    \begin{equation*}
+      \mbox{xLW}_1 \rightarrow \mbox{xLW}_2 \rightarrow \mbox{xLW}_3 \rightarrow \mbox{LW} \rightarrow \mbox{RE24}.
+    \end{equation*}
+    How do we choose which metric to use?
+
+\end{document}
