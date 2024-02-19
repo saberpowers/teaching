@@ -22,11 +22,11 @@
     }.
   \end{equation*}
 
-  We may interpret $s_j$ as an estimate of the strength of team $j$. We could use these estimated strengths to calculate a strength-of-schedule-adjusted score differential for each game. If $o_{ij}$ is the opponent of team $j$ in game $i$, then we would achieve this with $x_{ij} \cdot y_i + d_{o_{ij}}$. This leads to a strength-of-schedule-adjusted average score differential for team $j$:
+  We may interpret $s_j$ as an estimate of the strength of team $j$. We could use these estimated strengths to calculate a strength-of-schedule-adjusted score differential for each game. If $o_{ij}$ is the opponent of team $j$ in game $i$, then we would achieve this with $x_{ij} \cdot y_i + s_{o_{ij}}$. This leads to a strength-of-schedule-adjusted average score differential for team $j$:
   \begin{equation}
     \label{eqn-adjusted-point-differential}
     s^*_j = \frac{
-      \sum_{i=1}^n x_{ij} \cdot y_i + d_{o_{ij}}
+      \sum_{i=1}^n x_{ij} \cdot y_i + s_{o_{ij}}
     }{
       \sum_{i=1}^n x_{ij}^2
     }.
@@ -113,7 +113,7 @@
 
   One interpretable insight we can draw from the estimated regression coefficients is an estimate for the home-field advantage. In the linear regression, $\hat\beta_0$ is the estimated effect on the point spread in favor of the home team. In the logistic regression, $\hat\beta_0$ is the estimated effect on the log-odds in favor of the home team.
 
-  Predicting the future outcomes is an important application for sports teams (because of the strategic implications) and for sports bettors. The design matrix $\bf X$ does not encode future games, but the formula for extracting predictions from the model is the same as for past games. For a future game between home team $h$ and away team $a$, the predicted score differential using the linear regression is $\hat\beta_h - \hat\beta_a$; and the predicted probability of the home team winning using the logistic regression is $e^{\hat\beta_h - \hat\beta_a} / (1 + e^{\hat\beta_h - \hat\beta_a})$. To make a large number of predictions in a computationally efficient way, one could encode the future matchups in a new design matrix $\bf \tilde X$ and extract the predictions using $\bf \tilde X \boldsymbol{\hat\beta}$.
+  Predicting the future outcomes is an important application for sports teams (because of the strategic implications) and for sports bettors. The design matrix $\bf X$ does not encode future games, but the formula for extracting predictions from the model is the same as for past games. For a future game between home team $h$ and away team $a$, the predicted score differential using the linear regression is $\hat\beta_0 + \hat\beta_h - \hat\beta_a$; and the predicted probability of the home team winning using the logistic regression is $e^{\hat\beta_0 + \hat\beta_h - \hat\beta_a} / (1 + e^{\hat\beta_0 + \hat\beta_h - \hat\beta_a})$. To make a large number of predictions in a computationally efficient way, one could encode the future matchups in a new design matrix $\bf \tilde X$ and extract the predictions using $\bf \tilde X \boldsymbol{\hat\beta}$.
 
   \subsection{\sc Quiz Questions}
 
